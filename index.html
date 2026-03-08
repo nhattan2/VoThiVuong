@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gửi Mẹ Kính Yêu</title>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,400&family=Lora:wght@400;500&display=swap"
+        rel="stylesheet">
+
+    <style>
+        :root {
+            --gold-primary: #d4af37;
+            --gold-light: #f9f295;
+            --dark-red: #4a0404;
+            --deep-burgundy: #2d0a0a;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body,
+        html {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background: radial-gradient(circle, var(--dark-red), var(--deep-burgundy));
+            font-family: 'Lora', serif;
+            color: #fff;
+        }
+
+        /* Lớp phủ bụi vàng */
+        .gold-dust {
+            position: fixed;
+            width: 4px;
+            height: 4px;
+            background: var(--gold-light);
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 1;
+            box-shadow: 0 0 10px var(--gold-primary);
+        }
+
+        /* Hộp quà sang trọng */
+        #gift-wrap {
+            position: fixed;
+            inset: 0;
+            z-index: 100;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            background: #1a1a1a;
+            transition: all 1s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .box-container {
+            position: relative;
+            width: 180px;
+            height: 180px;
+            cursor: pointer;
+            perspective: 1000px;
+        }
+
+        .box-main {
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #8b0000, #4a0404);
+            border: 2px solid var(--gold-primary);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
+            position: relative;
+        }
+
+        /* Nơ vàng */
+        .ribbon-v,
+        .ribbon-h {
+            position: absolute;
+            background: linear-gradient(to right, #d4af37, #f9f295, #d4af37);
+            box-shadow: 0 0 10px rgba(212, 175, 55, 0.5);
+        }
+
+        .ribbon-v {
+            width: 30px;
+            height: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        .ribbon-h {
+            width: 100%;
+            height: 30px;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+
+        .box-container:hover {
+            transform: scale(1.05);
+            transition: 0.3s;
+        }
+
+        /* Nội dung thiệp - Phong cách hoàng gia */
+        #card-content {
+            display: none;
+            width: 90%;
+            max-width: 700px;
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(20px);
+            border-radius: 2px;
+            padding: 50px;
+            border: 1px solid var(--gold-primary);
+            box-shadow: 0 0 50px rgba(0, 0, 0, 0.5), inset 0 0 20px rgba(212, 175, 55, 0.2);
+            position: relative;
+            z-index: 10;
+            text-align: center;
+        }
+
+        h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: 2.8rem;
+            margin-bottom: 30px;
+            background: linear-gradient(to bottom, var(--gold-light) 20%, var(--gold-primary) 80%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: 4px;
+            font-style: italic;
+        }
+
+        #text-target {
+            font-size: 1.25rem;
+            line-height: 2;
+            color: #f0e6d2;
+            text-align: center;
+            font-weight: 300;
+        }
+
+        .highlight {
+            color: var(--gold-light);
+            font-weight: 600;
+            text-shadow: 0 0 8px rgba(249, 242, 149, 0.4);
+        }
+
+        .signature {
+            margin-top: 30px;
+            font-family: 'Playfair Display', serif;
+            font-size: 1.5rem;
+            color: var(--gold-primary);
+        }
+    </style>
+</head>
+
+<body>
+
+    <div id="gift-wrap" onclick="openMagic()">
+        <div class="box-container">
+            <div class="box-main">
+                <div class="ribbon-v"></div>
+                <div class="ribbon-h"></div>
+            </div>
+        </div>
+        <h2 style="color: var(--gold-primary); margin-top: 40px; font-family: 'Playfair Display'; letter-spacing: 2px;">
+            Dành riêng cho Mẹ</h2>
+        <p style="color: #888; font-size: 0.9rem;">(Chạm nhẹ để mở món quà)</p>
+    </div>
+
+    <div style="display: flex; justify-content: center; align-items: center; height: 100vh;">
+        <div id="card-content">
+            <h1>Mừng Ngày Quốc Tế Phụ Nữ</h1>
+            <div id="text-target"></div>
+            <div class="signature" style="opacity:0; transition: 2s;" id="sig">Con của Mẹ</div>
+        </div>
+    </div>
+
+    <script>
+        const message = `Kính gửi người phụ nữ cao quý nhất của đời con! ❤️\n\nChúc Mẹ <span class="highlight">Võ Thị Vương</span> một ngày 8/3 tràn đầy niềm kiêu hãnh và hạnh phúc. Chúc mẹ luôn giữ mãi vẻ đẹp <span class="highlight">sang trọng, tâm hồn an nhiên</span> và sức khỏe dồi dào.\n\nCảm ơn Mẹ đã luôn là bến đỗ bình yên, là ánh sáng dẫn lối cho gia đình mình. Mong rằng mọi điều tốt đẹp và tinh túy nhất sẽ luôn bên cạnh Mẹ, hôm nay và mãi mãi.`;
+
+        function openMagic() {
+            const wrap = document.getElementById('gift-wrap');
+            wrap.style.transform = 'translateY(-100%)';
+            setTimeout(() => {
+                wrap.style.display = 'none';
+                document.getElementById('card-content').style.display = 'block';
+                typeWriter();
+            }, 800);
+
+            // Pháo hoa vàng kim
+            let end = Date.now() + 4000;
+            (function frame() {
+                confetti({ particleCount: 3, angle: 60, spread: 55, origin: { x: 0 }, colors: ['#d4af37', '#ffffff'] });
+                confetti({ particleCount: 3, angle: 120, spread: 55, origin: { x: 1 }, colors: ['#d4af37', '#ffffff'] });
+                if (Date.now() < end) requestAnimationFrame(frame);
+            }());
+        }
+
+        let index = 0;
+        function typeWriter() {
+            const target = document.getElementById('text-target');
+            if (index < message.length) {
+                if (message.substring(index, index + 24) === '<span class="highlight">') {
+                    let endTag = message.indexOf('</span>', index) + 7;
+                    target.innerHTML += message.substring(index, endTag);
+                    index = endTag;
+                } else {
+                    target.innerHTML += message.charAt(index) === '\n' ? '<br>' : message.charAt(index);
+                    index++;
+                }
+                setTimeout(typeWriter, 50);
+            } else {
+                document.getElementById('sig').style.opacity = '1';
+            }
+        }
+
+        // Tạo bụi vàng rơi tinh tế
+        function createGoldDust() {
+            const dust = document.createElement('div');
+            dust.className = 'gold-dust';
+            dust.style.left = Math.random() * 100 + 'vw';
+            dust.style.top = '-10px';
+            dust.style.opacity = Math.random();
+            document.body.appendChild(dust);
+
+            dust.animate([
+                { transform: 'translateY(0) translateX(0)', opacity: 1 },
+                { transform: `translateY(110vh) translateX(${Math.random() * 50 - 25}px)`, opacity: 0 }
+            ], { duration: Math.random() * 5000 + 5000, easing: 'linear' }).onfinish = () => dust.remove();
+        }
+        setInterval(createGoldDust, 150);
+    </script>
+</body>
+
+</html>
